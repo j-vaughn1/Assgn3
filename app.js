@@ -5,6 +5,7 @@ var authJwtController = require('./auth_jwt');
 var User = require('./Users');
 var Movies = require('./Movies');
 var jwt = require('jsonwebtoken');
+mongoose.connect('mongodb://Jordan:abc@ds257808.mlab.com:57808/vaughnapi3');
 
 var app = express();
 app.use(bodyParser.json());
