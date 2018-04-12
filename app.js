@@ -4,6 +4,7 @@ var passport = require('passport');
 var authJwtController = require('./auth_jwt');
 var User = require('./Users');
 var Movies = require('./Movies');
+var Actor = require('./Actors');
 var jwt = require('jsonwebtoken');
 mongoose.connect('mongodb://Jordan:abc@ds257808.mlab.com:57808/vaughnapi3');
 
@@ -105,6 +106,85 @@ router.post('/signin', function(req, res) {
 
 
     });
+});
+
+router.post('/Movies', function(req, res) {
+    if (!req.body.username || !req.body.password) {
+        res.json({success: false, msg: 'Please enter: Title, Year Released, Genre, and Three actors and their character names.'});
+    }
+    else {
+        var Film = new Movies();
+        Film.title = req.body.title;
+        Film.year = req.body.year;
+        Film.Genre = req.body.Genre;
+        var Actor1 = new Actor();
+        Actor1.ActorName = req.body.ActorName;
+        Actor1.CharacterName = req.body.CharacterName;
+        var Actor2 = new Actor();
+        Actor2.ActorName = req.body.ActorName;
+        Actor2.CharacterName = req.body.CharacterName;
+        var Actor3 = new Actor();
+        Actor3.ActorName = req.body.ActorName;
+        Actor3.CharacterName = req.body.CharacterName;
+        var ActorGroup = [Actor1, Actor2, Actor3];
+        Film.Actor = req.body.ActorGroup;
+
+        // save the user
+        Film.save(function(err) {
+            if (err) {
+                // duplicate entry
+                if (err.code == 11000)
+                    return res.json({ success: false, message: 'A Movie with that info already exists. '});
+                else
+                    return res.send(err);
+            }
+
+            res.json({ message: 'Movie created!' });
+        });
+    }
+});
+
+router.route('/Movies/:title') //get the movie with this title
+
+    .get(function(req, res){
+
+    })
+
+    .put(function(req, res){
+        Movies.findById(req.params.title, function(err, Movies) {
+            if (err) res.send(err);
+
+            //update the movie's info
+            if(req.body.title) Movies.title = req.body.title;
+            if(req.body.year) Movies.year = req.body.year;
+            if(req.body.Genre) Movies.Genre = req.body.Genre;
+            for(var i =0; i<3; i++)
+            {
+                if (req.body.Actor.ActorName) Movies.Actor[i].ActorName = req.body.Actor.ActorName;
+                if (req.body.Actor.CharacterName) Movies.Actor[i].CharacterName = req.body.Actor.CharacterName;
+            }
+
+        });
+    });
+
+router.route('/Movies/:title')
+    .get(function(req, res){
+
+    })
+
+    .put(function(req, res){
+
+    })
+
+    .delete(function(req, res){
+        Movies.remove({
+            _id: req.params.title
+        }, function(err, Movies){
+            if(err) return res.send(err);
+
+            res.json({messsage: 'Movie was deleted.'});
+
+        });
 });
 
 app.use('/', router);
